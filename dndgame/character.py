@@ -1,36 +1,41 @@
+# player character class and race definitions
+
+from __future__ import annotations
+from typing import Dict,  List
+from dndgame.entities import Entity
 from dndgame.dice import roll
 
 
-class Character:
-    def __init__(self, name, race, base_hp):
-        self.name = name
-        self.race = race
-        self.stats = {}
-        self.base_hp = base_hp
-        self.hp = 0
-        self.max_hp = 0
-        self.level = 1
-        self.armor_class = 10
+RACE_BONUSES: Dict[str, Dict[str, int]] = {
+    "Human": {"STR": 1, "DEX": 1, "CON": 1, "INT": 1, "WIS": 1, "CHA": 1},
+    "Elf": {"DEX": 2},
+    "Dwarf": {"CON": 2},
+    "Halfing": {"DEX": 1, "CHA": 1},
+}
 
-    def get_modifier(self, stat):
-        """Calculate ability modifier."""
-        return (self.stats[stat] - 10) // 2
+STAT_NAMES: List[str] = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
 
-    def roll_stats(self):
+
+
+class Character(Entity):
+    def __init__(self, name: str, race: str, base_hp: int) -> None:
+        if race not in RACE_BONUSES:
+            raise ValueError(f"Unknown race: {race!r}. Valid races: {list(RACE_BONUSES)}")
+        super().__init__(name=name, stats={}, max_hp=0, armor_class=10)
+        self.race: str = race
+        self.base_hp: int = base_hp
+        self.level: int = 1
+
+    def roll_stats(self) -> None:
         print("Rolling stats...\n")
-        stats = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
-        for stat in stats:
+        for stat in STAT_NAMES:
             print(f"Rolling {stat}...")
             self.stats[stat] = roll(6, 3)
-
         self.max_hp = self.base_hp + self.get_modifier("CON")
         self.hp = self.max_hp
 
-    def apply_racial_bonuses(self):
-        if self.race == "Dwarf":
-            self.stats["CON"] += 2
-        elif self.race == "Elf":
-            self.stats["DEX"] += 2
-        elif self.race == "Human":
-            for stat in self.stats:
-                self.stats[stat] += 1
+
+
+    def apply_racial_bonuses(self) -> None:
+        for stat, bonus in RACE_BONUSES[self.race].items():
+            self.stats[stat] = self.stats.get(stat, 0) + bonus
