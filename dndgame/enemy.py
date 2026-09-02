@@ -3,6 +3,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Dict
+from dndgame.entities import Entity
 
 @dataclass(frozen=True)
 class EnemyTemplate:
