@@ -1,61 +1,60 @@
-from dndgame.character import Character
+# command-line entry point for the D&D Adventure game
+
+from __future__ import annotations
+from dndgame.character import Character, RACE_BONUSES
 from dndgame.dice import roll
+from dndgame.combat import Combat
+from dndgame.enemy import Enemy
+
+
+def prompt_int(prompt: str, valid_choices: range) -> int:
+    # Prompt until the user enters an integer within 'valid_choices'
+    while True:
+        raw = input(prompt).strip()
+        if raw.isdigit() and int(raw) in valid_choices:
+            return int(raw)
+        print(f"Please enter a number between {valid_choices.start} and {valid_choices.stop - 1}.")
+
 
 
 def create_character():
+    # Interactively create a new player character
     print("Welcome to D&D Adventure!")
-    name = input("Enter your character's name: ")
+    name = input("Enter your character's name: ").strip() or "Adventurer"
 
+    races = list(RACE_BONUSES)
     print("\nChoose your race:")
-    print("1. Human (+1 to all stats)")
-    print("2. Elf (+2 DEX)")
-    print("3. Dwarf (+2 CON)")
-    race_choice = input("Enter choice (1-3): ")
-    print("\n")
-    race = ["Human", "Elf", "Dwarf"][int(race_choice) - 1]
 
-    character = Character(name, race, 10)
+    for i, race in enumerate(races, start=1):
+        bonus_text = ", ".join(f"+{v} {stat}" for stat, v in RACE_BONUSES[race].items())
+        print(f"{1}. {race} ({bonus_text})")
+
+
+    choice = prompt_int(f"Enter choice (1-{len(races)}):", range(1, len(races) + 1))
+    race = races[choice - 1]
+    print()
+
+    character = Character(name, race, base_hp=10)
     character.roll_stats()
     character.apply_racial_bonuses()
     return character
 
 
-def display_character(character):
+def display_character(character: Character) -> None:
+    # Print a character's stats and HP to the console
     print(f"\n{character.name} the {character.race}")
     print("\nStats:")
-    for stat, value in character.stats.items():
-        modifier = character.get_modifier(stat)
-        print(f"{stat}: {value} ({'+' if modifier >= 0 else ''}{modifier})")
-    print(f"\nHP: {character.hp}")
+    lines = [
+        f"{stat}: {value} ({'+' if (mod := character.get_modifier(stat)) >+ 0 else ''}{mod})"
+        for stat, value in character.stats.items()
+    ]
+    print("\n".join(lines))
+    print(f"\nHP: {character.hp}/{character.max_hp}")
 
 
-def simple_combat(player):
-    print("\nA goblin appears!")
-    goblin_hp = 5
 
-    while goblin_hp > 0:
-        print(f"\nGoblin HP: {goblin_hp}")
-        print("\nYour turn!")
-        print("1. Attack")
-        print("2. Run away")
-        print()
-
-        choice = input("What do you do? ")
-        if choice == "1":
-            attack = roll(20, 1)
-            if attack >= 10:
-                damage = roll(4, 1)
-                goblin_hp -= damage
-                print(f"You hit for {damage} damage!")
-            else:
-                print("You missed!")
-        elif choice == "2":
-            return False
-
-    return True
-
-
-def main():
+def main() -> None:
+    # Run the main game loop
     player = create_character()
 
     while True:
@@ -64,19 +63,20 @@ def main():
         print("2. View character")
         print("3. Quit")
 
-        choice = input("Enter choice (1-3): ")
+        choice = prompt_int("Enter choice (1-3): ", range(1, 4))
 
         if choice == "1":
-            victory = simple_combat(player)
-            if victory:
-                print("You defeated the goblin!")
-            else:
-                print("You ran away!")
+            if not player.is_alive:
+                print("You are unconscious and cannot fight!")
+                continue
+            goblin = Enemy("Goblin")
+            combat = Combat(player, goblin)
+            victory = combat.run()
+            print("You defeated the goblin!" if victory else "The encounter is over")
         elif choice == "2":
             display_character(player)
         elif choice == "3":
             break
-
 
 if __name__ == "__main__":
     main()
