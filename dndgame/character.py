@@ -18,6 +18,8 @@ STAT_NAMES: List[str] = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
 
 
 class Character(Entity):
+    # A player-controlled character
+
     def __init__(self, name: str, race: str, base_hp: int) -> None:
         if race not in RACE_BONUSES:
             raise ValueError(f"Unknown race: {race!r}. Valid races: {list(RACE_BONUSES)}")
@@ -27,6 +29,7 @@ class Character(Entity):
         self.level: int = 1
 
     def roll_stats(self) -> None:
+        # Roll 3d6 for each ability score, then derive HP from CON
         print("Rolling stats...\n")
         for stat in STAT_NAMES:
             print(f"Rolling {stat}...")
@@ -37,5 +40,6 @@ class Character(Entity):
 
 
     def apply_racial_bonuses(self) -> None:
+        # Apply this character's racial stat bonuses (data-diven)
         for stat, bonus in RACE_BONUSES[self.race].items():
             self.stats[stat] = self.stats.get(stat, 0) + bonus
