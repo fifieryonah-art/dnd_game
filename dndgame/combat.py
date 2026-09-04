@@ -49,9 +49,10 @@ class Combat:
                 else:
                     self._enemy_turn(combatant)
 
-                if not self.enemy.is_alive:
+                fallen = list(filter(lambda e: not e.is_alive, [self.player, self.enemy]))
+                if self.enemy in fallen:
                     return True
-                if not self.player.is_alive:
+                if self.player in fallen:
                     print("\nYou have been defeated...")
                     return False
         return not self.enemy.is_alive

@@ -17,20 +17,19 @@ def prompt_int(prompt: str, valid_choices: range) -> int:
 
 
 
-def create_character():
-    # Interactively create a new player character
+def create_character() -> Character:
+    """Interactively create a new player Character."""
     print("Welcome to D&D Adventure!")
     name = input("Enter your character's name: ").strip() or "Adventurer"
 
     races = list(RACE_BONUSES)
     print("\nChoose your race:")
-
     for i, race in enumerate(races, start=1):
-        bonus_text = ", ".join(f"+{v} {stat}" for stat, v in RACE_BONUSES[race].items())
-        print(f"{1}. {race} ({bonus_text})")
+        bonus_parts = map(lambda item: f"+{item[1]} {item[0]}", RACE_BONUSES[race].items())
+        bonus_text = ", ".join(bonus_parts)
+        print(f"{i}. {race} ({bonus_text})")
 
-
-    choice = prompt_int(f"Enter choice (1-{len(races)}):", range(1, len(races) + 1))
+    choice = prompt_int(f"Enter choice (1-{len(races)}): ", range(1, len(races) + 1))
     race = races[choice - 1]
     print()
 
