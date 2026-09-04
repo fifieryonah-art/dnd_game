@@ -10,7 +10,7 @@ RACE_BONUSES: Dict[str, Dict[str, int]] = {
     "Human": {"STR": 1, "DEX": 1, "CON": 1, "INT": 1, "WIS": 1, "CHA": 1},
     "Elf": {"DEX": 2},
     "Dwarf": {"CON": 2},
-    "Halfing": {"DEX": 1, "CHA": 1},
+    "Halfling": {"DEX": 1, "CHA": 1},
 }
 
 STAT_NAMES: List[str] = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]

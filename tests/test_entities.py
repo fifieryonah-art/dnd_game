@@ -37,3 +37,7 @@ def test_take_damage_cannot_go_below_zero():
     assert lost == 5
     assert e.hp == 0
     assert e.is_alive is False
+
+def test_repr_shows_class_name_and_hp():
+    e = Entity("Goblin", {"STR": 8}, max_hp=5)
+    assert repr(e) == "Entity(name='Goblin', hp=5/5)"

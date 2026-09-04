@@ -14,6 +14,7 @@ class Entity:
         self.name: str = name 
         self.stats: Dict[str, int] = dict(stats)
         self.max_hp: int = max_hp
+        self.hp: int = max_hp
         self.armor_class: int = armor_class
 
     def get_modifier(self, stat: str) -> int:
